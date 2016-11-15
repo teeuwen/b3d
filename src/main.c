@@ -25,6 +25,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <AL/al.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -309,6 +311,9 @@ int main()
 	/* TODO Lighting */
 
 	time = glfwGetTime();
+
+	if (!alutInit(0, 0))
+		goto err;
 	
 	printf("\n\n\n\n\n\n\n\n");
 
@@ -354,6 +359,8 @@ err:
 	fprintf(stderr, "An internal OpenGL error has occured!\n");
 
 ret:
+	alutExit();
+
 	glfwTerminate();
 
 	return res;
