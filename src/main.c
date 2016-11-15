@@ -39,7 +39,7 @@
 #define KEY_BACKWARD	0b00010
 #define KEY_LEFT	0b00100
 #define KEY_RIGHT	0b01000
-#define KEY_SPRINT	0b10000
+#define KEY_RUN		0b10000
 
 struct coord {
 	double x;
@@ -95,7 +95,7 @@ void draw(void)
 #endif
 
 	if (keys & KEY_FORWARD)
-		loc.z += ((keys & KEY_SPRINT) ? 0.12f : 0.06f);
+		loc.z += ((keys & KEY_RUN) ? 0.12f : 0.06f);
 
 	if (keys & KEY_BACKWARD)
 		loc.z -= 0.06f;
@@ -210,42 +210,41 @@ void key_handle(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	(void) scancode;
 
-	if (mods & GLFW_MOD_SHIFT)
-		keys |= KEY_SPRINT;
+	if (mods & BNDM_RUN)
+		keys |= KEY_RUN;
 	else
-		keys &= ~KEY_SPRINT;
+		keys &= ~KEY_RUN;
 
 	if (action == GLFW_PRESS) {
 		switch (key) {
-		case GLFW_KEY_ESCAPE:
-		case GLFW_KEY_Q:
+		case BNDK_QUIT:
 			glfwSetWindowShouldClose(window, 1);
 			break;
-		case GLFW_KEY_W:
+		case BNDK_FORWARD:
 			keys |= KEY_FORWARD;
 			break;
-		case GLFW_KEY_S:
+		case BNDK_BACKWARD:
 			keys |= KEY_BACKWARD;
 			break;
-		case GLFW_KEY_A:
+		case BNDK_LEFT:
 			keys |= KEY_LEFT;
 			break;
-		case GLFW_KEY_D:
+		case BNDK_RIGHT:
 			keys |= KEY_RIGHT;
 			break;
 		}
 	} else if (action == GLFW_RELEASE) {
 		switch (key) {
-		case GLFW_KEY_W:
+		case BNDK_FORWARD:
 			keys &= ~KEY_FORWARD;
 			break;
-		case GLFW_KEY_S:
+		case BNDK_BACKWARD:
 			keys &= ~KEY_BACKWARD;
 			break;
-		case GLFW_KEY_A:
+		case BNDK_LEFT:
 			keys &= ~KEY_LEFT;
 			break;
-		case GLFW_KEY_D:
+		case BNDK_RIGHT:
 			keys &= ~KEY_RIGHT;
 			break;
 		}
@@ -327,14 +326,14 @@ int main()
 		}
 
 		printf("\033[2K\rLocation:\n");
-		printf("\033[2K\rX: %f\n", loc.x);
-		printf("\033[2K\rY: %f\n", rot.y);
-		printf("\033[2K\rZ: %f\n", rot.z);
+		printf("\033[2K\rX: %7.2f\n", loc.x);
+		printf("\033[2K\rY: %7.2f\n", loc.y);
+		printf("\033[2K\rZ: %7.2f\n", loc.z);
 
 		printf("\033[2K\rRotation:\n");
-		printf("\033[2K\rX: %f\n", rot.x);
-		printf("\033[2K\rY: %f\n", rot.y);
-		printf("\033[2K\rZ: %f", rot.z);
+		printf("\033[2K\rX: %7.2f\n", rot.x);
+		printf("\033[2K\rY: %7.2f\n", rot.y);
+		printf("\033[2K\rZ: %7.2f", rot.z);
 
 		draw();
 
@@ -345,14 +344,14 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
-	printf("\n");
-
 	goto ret;
+
+	printf("\n");
 
 err:
 	res = 1;
 
-	fprintf(stderr, "An internal OpenGL error has occured!");
+	fprintf(stderr, "An internal OpenGL error has occured!\n");
 
 ret:
 	glfwTerminate();

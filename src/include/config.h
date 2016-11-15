@@ -25,9 +25,18 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
+#include <GLFW/glfw3.h>
+
 #define WINDOW_WIDTH	1024
 #define WINDOW_HEIGHT	768
 
 #define CUR_SENSITIVITY	10.0f
+
+#define BNDK_QUIT	GLFW_KEY_Q
+#define BNDK_FORWARD	GLFW_KEY_W
+#define BNDK_BACKWARD	GLFW_KEY_S
+#define BNDK_LEFT	GLFW_KEY_A
+#define BNDK_RIGHT	GLFW_KEY_D
+#define BNDM_RUN	GLFW_MOD_SHIFT
 
 #endif
