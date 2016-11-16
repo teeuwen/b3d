@@ -141,8 +141,8 @@ void draw(void)
 	glLoadIdentity();
 
 	if (keys & KEY_FORWARD) {
-		loc.z += ((keys & KEY_RUN) ? 0.12f : 0.06f) * cos(DTR(rot.y));
-		loc.x -= ((keys & KEY_RUN) ? 0.12f : 0.06f) * sin(DTR(rot.y));
+		loc.z += ((keys & KEY_RUN) ? 0.10f : 0.06f) * cos(DTR(rot.y));
+		loc.x -= ((keys & KEY_RUN) ? 0.10f : 0.06f) * sin(DTR(rot.y));
 	}
 
 	if (keys & KEY_BACKWARD) {
@@ -178,12 +178,12 @@ void draw(void)
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	for (i = -50.0f; i < 50.0f; i += 1.0f) {
-		glVertex3f(i, 0.0f,  50.0f);
-		glVertex3f(i, 0.0f, -50.0f);
+	for (i = -64.0f; i < 64.0f; i += 1.0f) {
+		glVertex3f(i, 0.0f,  64.0f);
+		glVertex3f(i, 0.0f, -64.0f);
 
-		glVertex3f(-50.0f, 0.0f, i);
-		glVertex3f( 50.0f, 0.0f, i);
+		glVertex3f(-64.0f, 0.0f, i);
+		glVertex3f( 64.0f, 0.0f, i);
 	}
 
 	glEnd();
@@ -256,43 +256,45 @@ void draw(void)
 void key_handle(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	(void) scancode;
-
-	if (mods & BNDM_RUN)
-		keys |= KEY_RUN;
-	else
-		keys &= ~KEY_RUN;
+	(void) mods;
 
 	if (action == GLFW_PRESS) {
 		switch (key) {
-		case BNDK_QUIT:
+		case BND_QUIT:
 			glfwSetWindowShouldClose(window, 1);
 			break;
-		case BNDK_FORWARD:
+		case BND_FORWARD:
 			keys |= KEY_FORWARD;
 			break;
-		case BNDK_BACKWARD:
+		case BND_BACKWARD:
 			keys |= KEY_BACKWARD;
 			break;
-		case BNDK_LEFT:
+		case BND_LEFT:
 			keys |= KEY_LEFT;
 			break;
-		case BNDK_RIGHT:
+		case BND_RIGHT:
 			keys |= KEY_RIGHT;
+			break;
+		case BND_RUN:
+			keys |= KEY_RUN;
 			break;
 		}
 	} else if (action == GLFW_RELEASE) {
 		switch (key) {
-		case BNDK_FORWARD:
+		case BND_FORWARD:
 			keys &= ~KEY_FORWARD;
 			break;
-		case BNDK_BACKWARD:
+		case BND_BACKWARD:
 			keys &= ~KEY_BACKWARD;
 			break;
-		case BNDK_LEFT:
+		case BND_LEFT:
 			keys &= ~KEY_LEFT;
 			break;
-		case BNDK_RIGHT:
+		case BND_RIGHT:
 			keys &= ~KEY_RIGHT;
+			break;
+		case BND_RUN:
+			keys &= ~KEY_RUN;
 			break;
 		}
 	}
