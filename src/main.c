@@ -140,28 +140,6 @@ void draw(void)
 
 	glLoadIdentity();
 
-#if 0
-	glTranslatef(0, 0, -1.5f);
-
-	gluLookAt(0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-
-	gluLookAt(5.0f, 5.0f, 5.0f, x, 0.0f, y, 0.0f, 1.0f, 0.0f);
-
-	glRotatef(angt, 1.0f, 1.0f, 1.0f);
-
-	glBegin(GL_LINES);
-
-	for (int i = -600; i < 600; i += 20) {
-		glVertex3f(i, -50.0f,  600.0f);
-		glVertex3f(i, -50.0f, -600.0f);
-
-		glVertex3f(-600.0f, -50.0f, i);
-		glVertex3f( 600.0f, -50.0f, i);
-	}
-
-	glEnd();
-#endif
-
 	if (keys & KEY_FORWARD) {
 		loc.z += ((keys & KEY_RUN) ? 0.12f : 0.06f) * cos(DTR(rot.y));
 		loc.x -= ((keys & KEY_RUN) ? 0.12f : 0.06f) * sin(DTR(rot.y));
@@ -191,21 +169,8 @@ void draw(void)
 	glTranslatef(loc.x, -2.0f, loc.z);
 	/* glScalef(-2.0f, -2.0f, -2.0f); */
 
-#if 0
-	glBegin(GL_QUADS);
-
-	glColor3f(0.0f, 0.498f, 0.0f);
-
-	glVertex3f(-200.0f, -2.0f,  200.0f);
-	glVertex3f( 200.0f, -2.0f,  200.0f);
-	glVertex3f(-200.0f, -2.0f, -200.0f);
-	glVertex3f( 200.0f, -2.0f, -200.0f);
-
-	glEnd();
-#endif
-
-	/* Floor */
 #if 1
+	/* Floor */
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
@@ -213,7 +178,7 @@ void draw(void)
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	for (i = -50.0f; i < 50.0f; i += 1.6f) {
+	for (i = -50.0f; i < 50.0f; i += 1.0f) {
 		glVertex3f(i, 0.0f,  50.0f);
 		glVertex3f(i, 0.0f, -50.0f);
 
@@ -226,31 +191,13 @@ void draw(void)
 	glPopMatrix();
 #endif
 
-	/* Wall */
-#if 0
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-
-	glBegin(GL_QUADS);
-
-	glColor3f( 0.4f, 0.7f, 0.8f);
-	glVertex3f( 50.0f,  5.0f, -50.0f);
-	glVertex3f(-50.0f,  5.0f, -50.0f);
-	glVertex3f(-50.0f,  0.0f,  -50.0f);
-	glVertex3f( 50.0f,  0.0f,  -50.0f);
-
-	glEnd();
-
-	glPopMatrix();
-#endif
-
-	/* Pyramid */
 #if 1
+	/* Cube */
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
 	glEnable(GL_TEXTURE_2D);
-	texture_load("src/textures/grass.png");
+	texture_load("src/textures/test.png");
 
 	glTranslatef(0.0f, 0.0f, -14.0f);
 	glRotatef(angt, 0.0f, 1.0f, 0.0f);
@@ -259,48 +206,46 @@ void draw(void)
 		angt = 0.0f;
 	angt += 0.2f;
 
-	glBegin(GL_TRIANGLES);
-
-	/* Front */
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f( 0.0f,  2.0f,  0.0f);
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(-1.0f,  0.0f,  1.0f);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f( 1.0f,  0.0f,  1.0f);
-
-	/* Right */
-	glColor3f( 0.0f,  0.0f,  1.0f);
-	glVertex3f( 0.0f,  2.0f,  0.0f);
-	glVertex3f( 1.0f,  0.0f,  1.0f);
-	glVertex3f( 1.0f,  0.0f, -1.0f);
-
-	/* Back */
-	glColor3f( 0.0f,  1.0f,  0.0f);
-	glVertex3f( 0.0f,  2.0f,  0.0f);
-	glVertex3f( 1.0f,  0.0f, -1.0f);
-	glVertex3f(-1.0f,  0.0f, -1.0f);
-
-	/* Left */
-	glColor3f( 1.0f,  0.0f,  0.0f);
-	glVertex3f( 0.0f,  2.0f,  0.0f);
-	glVertex3f(-1.0f,  0.0f, -1.0f);
-	glVertex3f(-1.0f,  0.0f,  1.0f);
-
-	glEnd();
-
-#if 0
+	/* FIXME Use GL_TRIANGLES, GL_QUADS will be deprecated */
 	glBegin(GL_QUADS);
 
+	/* Top */
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f,  1.0f,  0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f( 0.5f,  1.0f,  0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.5f,  1.0f, -0.5f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f,  1.0f, -0.5f);
+
 	/* Bottom */
-	glColor3f( 0.4f, 0.3f, 0.0f);
-	glVertex3f(-1.0f,  0.0f, -1.0f);
-	glVertex3f( 1.0f,  0.0f, -1.0f);
-	glVertex3f( 1.0f,  0.0f,  1.0f);
-	glVertex3f(-1.0f,  0.0f,  1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f,  1.0f, -0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.5f,  1.0f, -0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f( 0.5f,  1.0f,  0.5f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f,  1.0f,  0.5f);
+
+	/* Front */
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f,  0.0f,  0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.5f,  0.0f,  0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f( 0.5f,  1.0f,  0.5f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f,  1.0f,  0.5f);
+
+	/* Back */
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f,  1.0f, -0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f( 0.5f,  1.0f, -0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.5f,  0.0f, -0.5f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f,  0.0f, -0.5f);
+
+	/* Left */
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f,  1.0f,  0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f,  1.0f, -0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f,  0.0f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f,  0.0f,  0.5f);
+
+	/* Right */
+	glTexCoord2f(0.0f, 0.0f); glVertex3f( 0.5f,  0.0f,  0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.5f,  0.0f, -0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f( 0.5f,  1.0f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f( 0.5f,  1.0f,  0.5f);
 
 	glEnd();
-#endif
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -381,6 +326,9 @@ int main()
 	if (!glfwInit())
 		goto err;
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "B3D",
 			NULL, NULL);
 
@@ -397,7 +345,8 @@ int main()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(24.0f, WINDOW_WIDTH / WINDOW_HEIGHT, 1.0f, 1500.0f);
+	gluPerspective(FIELD_OF_VIEW, (double) WINDOW_WIDTH / WINDOW_HEIGHT,
+			0.01f, RENDER_DISTANCE);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -416,7 +365,7 @@ int main()
 		goto err;
 #endif
 
-	printf("\n\n\n\n\n\n\n\n\n");
+	printf("\e[?25l\n\n\n\n\n\n\n\n\n");
 
 	while (!glfwWindowShouldClose(window)) {
 		printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
@@ -450,7 +399,7 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
-	printf("\n");
+	printf("\e[?25h");
 
 	goto ret;
 

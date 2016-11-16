@@ -29,8 +29,11 @@
 
 /* #define AUDIO */
 
-#define WINDOW_WIDTH	1024
-#define WINDOW_HEIGHT	768
+#define WINDOW_WIDTH	1920
+#define WINDOW_HEIGHT	1080
+
+#define RENDER_DISTANCE	256.0f
+#define FIELD_OF_VIEW	60.0f
 
 #define CUR_SENSITIVITY	16.0f
 
