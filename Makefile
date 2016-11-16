@@ -2,7 +2,7 @@
 # Makefile
 #
 
-CFLAGS		:= -Wall -Wextra -fdiagnostics-color=auto -std=c89 -lm
+CFLAGS		:= -Wall -Wextra -fdiagnostics-color=auto -std=c89 -g
 LDLIBS		:= -lm -lglfw -lGL -lGLU -lalut -lpng
 
 b3d-o		= src/main.o

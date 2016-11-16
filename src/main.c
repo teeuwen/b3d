@@ -71,43 +71,65 @@ struct coord loc;
 struct coord rot;
 #endif
 
-int texture_load(const char *path)
+/* TODO Clean and free */
+GLuint texture_load(const char *path)
 {
 	FILE *file;
 	png_structp png;
-	png_infop png_info;
+	png_info *info;
 
-	int width, height;
-	png_bytep *pngp;
+	int i, width, height;
+	png_byte *data;
+	png_byte **rows;
+
+	GLuint texture;
 
 	file = fopen(path, "r");
 
 	if (!file)
-		return 1;
+		return 0;
 
 	png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 
 	if (!png)
-		return 1;
+		return 0;
 
-	png_info = png_create_info_struct(png);
+	info = png_create_info_struct(png);
 
-	if (!png_info)
-		return 1;
+	if (!info)
+		return 0;
 
 	png_init_io(png, file);
-	png_read_info(png, png_info);
+	png_read_info(png, info);
 
-	width = png_get_image_width(png, png_info);
-	height = png_get_image_height(png, png_info);
+	width = png_get_image_width(png, info);
+	height = png_get_image_height(png, info);
 
-	pngp = malloc(sizeof(png_bytep) * height);
+	data = malloc(png_get_rowbytes(png, info) * height * sizeof(png_byte));
 
-	png_read_image(png, pngp);
+	if (!data)
+		return 0;
+
+	rows = malloc(height * sizeof(png_byte *));
+
+	if (!rows)
+		return 0;
+
+	for (i = 0; i < height; i++)
+		rows[height - 1 - i] = data + i * png_get_rowbytes(png, info);
+
+	png_read_image(png, rows);
 
 	fclose(file);
 
-	return 0;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+			width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	return texture;
 }
 
 void draw(void)
@@ -227,6 +249,9 @@ void draw(void)
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
+	glEnable(GL_TEXTURE_2D);
+	texture_load("src/textures/grass.png");
+
 	glTranslatef(0.0f, 0.0f, -14.0f);
 	glRotatef(angt, 0.0f, 1.0f, 0.0f);
 
@@ -237,9 +262,11 @@ void draw(void)
 	glBegin(GL_TRIANGLES);
 
 	/* Front */
-	glColor3f( 1.0f,  0.0f,  0.0f);
+	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f( 0.0f,  2.0f,  0.0f);
+	glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(-1.0f,  0.0f,  1.0f);
+	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f( 1.0f,  0.0f,  1.0f);
 
 	/* Right */
@@ -255,7 +282,7 @@ void draw(void)
 	glVertex3f(-1.0f,  0.0f, -1.0f);
 
 	/* Left */
-	glColor3f( 0.0f,  0.7f,  1.0f);
+	glColor3f( 1.0f,  0.0f,  0.0f);
 	glVertex3f( 0.0f,  2.0f,  0.0f);
 	glVertex3f(-1.0f,  0.0f, -1.0f);
 	glVertex3f(-1.0f,  0.0f,  1.0f);
@@ -274,6 +301,8 @@ void draw(void)
 
 	glEnd();
 #endif
+
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 #endif
@@ -342,7 +371,6 @@ void cur_handle(GLFWwindow *window, double xpos, double ypos)
 	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 }
 
-/* int main(int argc, char **argv) */
 int main()
 {
 	double time;
@@ -387,7 +415,7 @@ int main()
 	if (!alutInit(0, 0))
 		goto err;
 #endif
-	
+
 	printf("\n\n\n\n\n\n\n\n\n");
 
 	while (!glfwWindowShouldClose(window)) {
