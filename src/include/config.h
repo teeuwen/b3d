@@ -27,10 +27,12 @@
 
 #include <GLFW/glfw3.h>
 
+/* #define AUDIO */
+
 #define WINDOW_WIDTH	1024
 #define WINDOW_HEIGHT	768
 
-#define CUR_SENSITIVITY	10.0f
+#define CUR_SENSITIVITY	16.0f
 
 #define BNDK_QUIT	GLFW_KEY_Q
 #define BNDK_FORWARD	GLFW_KEY_W

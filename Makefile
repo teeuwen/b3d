@@ -2,8 +2,8 @@
 # Makefile
 #
 
-CFLAGS		:= -Wall -Wextra -fdiagnostics-color=auto -std=c89
-LDLIBS		:= -lm -lglfw -lGL -lGLU -lalut
+CFLAGS		:= -Wall -Wextra -fdiagnostics-color=auto -std=c89 -lm
+LDLIBS		:= -lm -lglfw -lGL -lGLU -lalut -lpng
 
 b3d-o		= src/main.o
 b3d-i		= -I src/include

@@ -25,7 +25,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <AL/al.h>
+#include <png.h>
+
+#include <AL/alut.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,8 +36,10 @@
 #include <config.h>
 
 /* XXX Relocate */
-/*#define RTD(r)		((r) * 180 / M_PI)
-#define DTR(d)		((r) * M_PI / 180)*/
+
+#define PI		3.14159265358979323846
+
+#define DTR(d)		((d) * PI / 180)
 
 #define KEY_FORWARD	0b00001
 #define KEY_BACKWARD	0b00010
@@ -60,11 +64,51 @@ short keys;
 
 /* XXX TEMP */
 double angt;
+double az;
 
 #if 1
 struct coord loc;
 struct coord rot;
 #endif
+
+int texture_load(const char *path)
+{
+	FILE *file;
+	png_structp png;
+	png_infop png_info;
+
+	int width, height;
+	png_bytep *pngp;
+
+	file = fopen(path, "r");
+
+	if (!file)
+		return 1;
+
+	png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+
+	if (!png)
+		return 1;
+
+	png_info = png_create_info_struct(png);
+
+	if (!png_info)
+		return 1;
+
+	png_init_io(png, file);
+	png_read_info(png, png_info);
+
+	width = png_get_image_width(png, png_info);
+	height = png_get_image_height(png, png_info);
+
+	pngp = malloc(sizeof(png_bytep) * height);
+
+	png_read_image(png, pngp);
+
+	fclose(file);
+
+	return 0;
+}
 
 void draw(void)
 {
@@ -96,28 +140,34 @@ void draw(void)
 	glEnd();
 #endif
 
-	if (keys & KEY_FORWARD)
-		loc.z += ((keys & KEY_RUN) ? 0.12f : 0.06f);
-
-	if (keys & KEY_BACKWARD)
-		loc.z -= 0.06f;
-
-	if (keys & KEY_LEFT)
-		loc.x += 0.06f;
-
-	if (keys & KEY_RIGHT)
-		loc.x -= 0.06f;
-
-	if (keys > 0) {
-		/* TODO Head bouncing */
+	if (keys & KEY_FORWARD) {
+		loc.z += ((keys & KEY_RUN) ? 0.12f : 0.06f) * cos(DTR(rot.y));
+		loc.x -= ((keys & KEY_RUN) ? 0.12f : 0.06f) * sin(DTR(rot.y));
 	}
+
+	if (keys & KEY_BACKWARD) {
+		loc.z -= 0.06f * cos(DTR(rot.y));
+		loc.x += 0.06f * sin(DTR(rot.y));
+	}
+
+	if (keys & KEY_LEFT) {
+		loc.z += 0.06f * sin(DTR(rot.y));
+		loc.x += 0.06f * cos(DTR(rot.y));
+	}
+
+	if (keys & KEY_RIGHT) {
+		loc.z -= 0.06f * sin(DTR(rot.y));
+		loc.x -= 0.06f * cos(DTR(rot.y));
+	}
+
+	/* TODO Head bouncing */
 
 	glRotatef(rot.x, 1.0f, 0.0f, 0.0f);
 	glRotatef(rot.y, 0.0f, 1.0f, 0.0f);
-	/*glTranslatef(-x, -y, -z);*/
-	/*glTranslatef(0, 0, 1.0f);*/
+	/* glTranslatef(-x, -y, -z); */
+	/* glTranslatef(0, 0, 1.0f); */
 	glTranslatef(loc.x, -2.0f, loc.z);
-	/*glScalef(transt, transt, transt);*/
+	/* glScalef(-2.0f, -2.0f, -2.0f); */
 
 #if 0
 	glBegin(GL_QUADS);
@@ -141,13 +191,31 @@ void draw(void)
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	for (i = -200.0f; i < 200.0f; i += 1.0f) {
-		glVertex3f(i, 0.0f,  200.0f);
-		glVertex3f(i, 0.0f, -200.0f);
+	for (i = -50.0f; i < 50.0f; i += 1.6f) {
+		glVertex3f(i, 0.0f,  50.0f);
+		glVertex3f(i, 0.0f, -50.0f);
 
-		glVertex3f(-200.0f, 0.0f, i);
-		glVertex3f( 200.0f, 0.0f, i);
+		glVertex3f(-50.0f, 0.0f, i);
+		glVertex3f( 50.0f, 0.0f, i);
 	}
+
+	glEnd();
+
+	glPopMatrix();
+#endif
+
+	/* Wall */
+#if 0
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	glBegin(GL_QUADS);
+
+	glColor3f( 0.4f, 0.7f, 0.8f);
+	glVertex3f( 50.0f,  5.0f, -50.0f);
+	glVertex3f(-50.0f,  5.0f, -50.0f);
+	glVertex3f(-50.0f,  0.0f,  -50.0f);
+	glVertex3f( 50.0f,  0.0f,  -50.0f);
 
 	glEnd();
 
@@ -194,15 +262,18 @@ void draw(void)
 
 	glEnd();
 
-	/*glBegin(GL_QUADS);
+#if 0
+	glBegin(GL_QUADS);
 
+	/* Bottom */
 	glColor3f( 0.4f, 0.3f, 0.0f);
 	glVertex3f(-1.0f,  0.0f, -1.0f);
 	glVertex3f( 1.0f,  0.0f, -1.0f);
 	glVertex3f( 1.0f,  0.0f,  1.0f);
 	glVertex3f(-1.0f,  0.0f,  1.0f);
 
-	glEnd();*/
+	glEnd();
+#endif
 
 	glPopMatrix();
 #endif
@@ -282,7 +353,7 @@ int main()
 	if (!glfwInit())
 		goto err;
 
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "test 3d engine",
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "B3D",
 			NULL, NULL);
 
 	if (!window)
@@ -312,13 +383,15 @@ int main()
 
 	time = glfwGetTime();
 
+#ifdef AUDIO
 	if (!alutInit(0, 0))
 		goto err;
+#endif
 	
-	printf("\n\n\n\n\n\n\n\n");
+	printf("\n\n\n\n\n\n\n\n\n");
 
 	while (!glfwWindowShouldClose(window)) {
-		printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
+		printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
 
 		if (glfwGetTime() - time >= 1.0) {
 			printf("\033[2K\r%f FPS\n",
@@ -338,7 +411,7 @@ int main()
 		printf("\033[2K\rRotation:\n");
 		printf("\033[2K\rX: %7.2f\n", rot.x);
 		printf("\033[2K\rY: %7.2f\n", rot.y);
-		printf("\033[2K\rZ: %7.2f", rot.z);
+		printf("\033[2K\rZ: %7.2f\n", rot.z);
 
 		draw();
 
@@ -349,9 +422,9 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
-	goto ret;
-
 	printf("\n");
+
+	goto ret;
 
 err:
 	res = 1;
@@ -359,7 +432,9 @@ err:
 	fprintf(stderr, "An internal OpenGL error has occured!\n");
 
 ret:
+#ifdef AUDIO
 	alutExit();
+#endif
 
 	glfwTerminate();
 
